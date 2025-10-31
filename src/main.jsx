@@ -1,55 +1,64 @@
-import { StrictMode } from "react";
+import { StrictMode, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
-import App from "./App.jsx";
+
 import Root from "./components/Root/Root.jsx";
 import Home from "./components/Home/Home.jsx";
-import Mobiles from "./components/Mobiles/mobiles.jsx";
-import laptops from "./components/Laptops/laptops.jsx";
-import Header from "./components/Header/Header.jsx";
+import Mobiles from "./components/Mobiles/Mobiles.jsx";
+import Laptops from "./components/Laptops/Laptops.jsx";
+import Users from "./components/Users/Users.jsx";
+import Users2 from "./components/Users2/Users2.jsx";
+import UserDetails  from "./components/UserDetails/UserDetails.jsx"
+
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import Posts from "./components/Posts/Posts.jsx";
+import PostDetails from "./components/PostDetail/PostDetail.jsx";
+import PostDetail from "./components/PostDetail/PostDetail.jsx";
 
 
+const usersPromise = fetch("https://jsonplaceholder.typicode.com/users")
+  .then(res => res.json());
 
 const router = createBrowserRouter([
   {
     path: "/",
-    Component: Root,
+    element: <Root />,
     children: [
+      { index: true, element: <Home /> },
+      { path: "mobiles", element: <Mobiles /> },
+      { path: "laptops", element: <Laptops /> },
+
+      { 
+        path: "users",
+        loader: () => fetch("https://jsonplaceholder.typicode.com/users"),
+        element: <Users />
+      },
+
       {
-        index: true,
-        Component: Header,
+        path: "user2",
+        element: (
+          <Suspense fallback={<span>Loading...</span>}>
+            <Users2 usersPromise={usersPromise} />
+          </Suspense>
+        )
       },
       {
-        path: "/mobiles",
-        Component: Mobiles,
+        path: 'users/:userId',
+        loader: ({ params }) => fetch(`https://jsonplaceholder.typicode.com/users/${params.userId}`),
+        Component: UserDetails
       },
       {
-        path: "/src/components/Mobiles",
-        Component: Mobiles,
+        path: 'posts',
+        loader: () => fetch('https://jsonplaceholder.typicode.com/posts'),  
+        Component: Posts
       },
       {
-        path: "/src/components/Laptops",
-        Component: laptops,
-      },
-      {
-        path: "/src/components/Home",
-        Component: Home,
-      },
-    ],
-  },
-  {
-    path: "/contact",
-    element: <div>Contact Us</div>,
-  },
-  {
-    path: "/app",
-    element: <App />,
-  },
-  {
-    path: "/app2",
-    Component: App,
-  },
+        path: 'posts/:postId',
+        loader: ({ params }) => fetch(`https://jsonplaceholder.typicode.com/posts/${params.postId}`),
+        Component: PostDetail
+      }
+    ]
+  }
 ]);
 
 createRoot(document.getElementById("root")).render(
