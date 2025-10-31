@@ -10,14 +10,15 @@ const Root = () => {
   const navigation = useNavigation();
   const isNavigating = Boolean(navigation.location)
 
-}
 
-export default function Root() {
+
+{
   return (
     <div className="root-container">
-      <Header /> 
+       <Side />
       <div className="main-content">
-        <Side />
+        <Header />
+        
         {isNavigating && <span>Loading...</span>} 
         <Outlet /> 
         <Footer />
@@ -25,3 +26,5 @@ export default function Root() {
     </div>
   );
 }
+};
+export default Root;
